@@ -1,5 +1,5 @@
 from flask import Blueprint, abort, request, jsonify, url_for, redirect
-
+import json
 from app import db
 
 main = Blueprint('main', __name__)
@@ -29,6 +29,12 @@ endpoints = {
             "paramaters": {
                 "none": "key has to exist, should route access to correct endpoint"
             }
+        },
+        "multi key access": {
+            "url": "/keys?",
+            "paramaters": {
+                "query string": "expects the ?keys=[1,2,3] with 1,2,3 being keys to access"
+            }
         }
 	}
 }
@@ -39,15 +45,32 @@ def key_check(key):
     else:
         return(False)
 
-def key_type_check(key):
-    #assume key exists
-    return(db.type(key))
+def key_type_check(*args):
+    print("args:", args, flush=True)
+    empty = {}
+    for i in args.pop():
+
+        empty.update({i:  db.type(i)})
+
+    return(empty)
 
 
 
 @main.route('/')
 def index():
     return(jsonify(endpoints))
+
+@main.route('/keys')
+def keys():
+    a = request.args.get('keys')
+    # print(a.split(","), flush=True)
+    new = a.split(",")
+    new = list(new)
+    print(new, flush=True)
+    keys = key_type_check(a)
+    # print(keys, flush=True)
+
+    return(jsonify({"keys" : keys}))
 
 @main.route('/check/<key>')
 def check(key):

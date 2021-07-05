@@ -1,2 +1,2 @@
 #redis: redis-server --port 7777
-web: python -u manage.py runserver
+web: python -u run.py
