@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, request, jsonify
+from flask import Blueprint, abort, request, jsonify, url_for, redirect
 
 from app import db
 
@@ -22,6 +22,12 @@ endpoints = {
             "url": "/_delete",
             "paramaters": {
                 "key": "key you want to delete"
+            }
+        },
+        "key access": {
+            "url": "/<key>",
+            "paramaters": {
+                "none": "key has to exist, should route access to correct endpoint"
             }
         }
 	}
@@ -50,13 +56,17 @@ def check(key):
     return(jsonify({"type": key_type_check(key)}))
 
 @main.route('/<key>', methods=['GET', 'POST'])
-
 def key_access(key):
     if request.method == "GET":
         if key_check(key) is False:
-            return(jsonify({"Error string Not found": key}))
+            return(jsonify({"Error key Not found": key}))
         type = key_type_check(key)
-        return(jsonify({"type": type}))
+        if type == 'string':
+            return(redirect(url_for('main.access', key=key)))
+
+#        return(jsonify({"type": type}))
+
+
 
 
 @main.route('/_delete')
