@@ -27,7 +27,12 @@ def create_app(config):
 
     Config[config_name].init_app(app)
 
+    from .default import default as default_blueprint
+    app.register_blueprint(default_blueprint)
+
     from .redis import main as redis_blueprint
     app.register_blueprint(redis_blueprint, url_prefix='/redis')
+
+
 
     return app
