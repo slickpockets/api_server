@@ -12,8 +12,12 @@ api server:
     returns value for string
   post: /string/<string>
     expects string and value args:
-        {"string": string, "value": value}
-
+        {"key": key, "value": value}
+  delete: /_delete
+    expect: {"key": key}
+  
+  key_access: /<key>
+    expects: key exists otherwise errors, will route to correct endpoint
 
 todo:
   redis:
