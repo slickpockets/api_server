@@ -60,11 +60,22 @@ def key_access(key):
     if request.method == "GET":
         if key_check(key) is False:
             return(jsonify({"Error key Not found": key}))
-        type = key_type_check(key)
-        if type == 'string':
-            return(redirect(url_for('main.access', key=key)))
 
-#        return(jsonify({"type": type}))
+    type = key_type_check(key)
+    if type == 'string':
+        return(redirect(url_for('main.string_access', key=key)))
+    elif type == 'list':
+        return(redirect(url_for('main.list_access', key=key)))
+    elif type == 'set':
+        return(redirect(url_for('main.set_access', key=key)))
+    elif type == 'hash':
+        return(redirect(url_for('main.hash_access', name=key, key=None)))
+    elif type == 'zset':
+        return(redirect(url_for('main.sorted_set_access', name=key)))
+    else:
+        return(jsonify({"error": "not found"}))
+
+    return(jsonify({"error": "shouldnt be hitting this"}))
 
 
 
@@ -75,7 +86,7 @@ def delete():
 
 
 @main.route('/string/<key>', methods=['GET', 'POST'])
-def access(key):
+def string_access(key):
     if request.method == "GET":
         if db.get(key) is None:
             return(jsonify({"Error string Not found": key}))
@@ -91,8 +102,37 @@ def access(key):
         else:
             return(jsonify({"pass json please"}))
 
+@main.route('/list/<key>', methods=['GET', 'POST'])
+def list_access(key):
+    if request.method == "GET":
+        return(jsonify({"GET": "list"}))
+    elif request.method == "POST":
+        return(jsonify({"POST": "list"}))
+
+@main.route("/set/<key>", methods=['GET', 'POST'])
+def set_access(key):
+    if request.method == "GET":
+        return(jsonify({"GET": "set"}))
+    elif request.method == "POST":
+        return(jsonify({"POST": "set"}))
 
 
+@main.route("/hash/<name>/", methods=['GET', 'POST'])
+@main.route("/hash/<name>/<key>", methods=['GET', 'POST'])
+def hash_access(name, key=None):
+    if request.method == "GET":
+        return(jsonify({"GET": "hash"}))
+    elif request.method == "POST":
+        return(jsonify({"POST": "hash"}))
+
+
+@main.route("/sorted-set/<name>/", methods=['GET', 'POST'])
+@main.route("/sorted-set/<name>/<key>", methods=['GET', 'POST'])
+def sorted_set_access(name, key=None):
+    if request.method == "GET":
+        return(jsonify({"GET": "zset"}))
+    elif request.method == "POST":
+        return(jsonify({"POST": "zset"}))
 
 @main.errorhandler(404)
 def not_found(error):
